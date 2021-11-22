@@ -2,7 +2,10 @@
 on:
   workflow_call:
     inputs: {}
-    secrets: {}
+    secrets: 
+      OPENSHIFT_TOKEN:
+        description: 'AJWT token to access OCP'
+        required: true
 
 jobs:
   build:
