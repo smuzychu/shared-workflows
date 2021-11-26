@@ -1,4 +1,4 @@
-
+name: build and deploy a quakus application
 on:
   workflow_call:
     inputs: {}
