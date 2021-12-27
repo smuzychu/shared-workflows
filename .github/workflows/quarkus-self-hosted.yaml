@@ -1,0 +1,242 @@
+name: build and deploy a quarkus application
+on:
+  workflow_call:
+    inputs: 
+      app:
+        description: 'the name of the app this repo belongs to'
+        required: true
+        type: string
+    secrets: {}
+
+jobs:
+  java-build:
+    runs-on: [self-hosted, "${{ inputs.app }}",java]
+    steps:
+    - name: set repo name
+      shell: bash
+      run: | 
+        echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV        
+
+    - name: checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v1
+      with:
+        java-version: 11
+
+    - name: Static code check (Emulated)
+      run: |
+        echo noop
+
+    - name: Cache Maven packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: Build
+      run: |
+        ./mvnw -B -DskipTests clean package --file pom.xml
+
+  image-build:
+    runs-on: [self-hosted, "${{ inputs.app }}",buildah]
+    steps:
+    - name: set repo name
+      shell: bash
+      run: | 
+        echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV       
+
+    - name: Build Image
+      id: build-image
+      uses: redhat-actions/buildah-build@v2
+      with:
+        image: ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }}
+        tags: latest ${{ github.sha }}
+        containerfiles: |
+          ./${{ env.PROJECT_DIR }}/src/main/docker/Dockerfile.jvm
+
+    # Podman Login action (https://github.com/redhat-actions/podman-login) also be used to log in,
+    # in which case 'username' and 'password' can be omitted.
+    - name: Push To ghcr.io
+      id: push-to-ghcr
+      uses: redhat-actions/push-to-registry@v2
+      with:
+        image: ${{ steps.build-image.outputs.image }}
+        tags: ${{ steps.build-image.outputs.tags }}
+        registry: ghcr.io/${{ github.repository_owner }}
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }} 
+
+  deploy-dev:
+    runs-on: [self-hosted, "${{ inputs.app }}"]
+    needs: build
+    steps:
+    - name: set repo name
+      shell: bash
+      run: | 
+        echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
+    - name: set ocp token
+      shell: bash
+      run: | 
+        echo "KUBERNETES_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" >> $GITHUB_ENV
+        echo "KUBERNETES_CA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)" >> $GITHUB_ENV        
+    - name: checkout code
+      uses: actions/checkout@v2             
+    - name: kubernetes login
+      uses: redhat-actions/oc-login@v1
+      with:
+        # URL to your OpenShift cluster.
+        # Refer to Step 2.
+        openshift_server_url: https://kubernetes.default.svc:443
+
+        # Authentication Token. Can use username and password instead.
+        # Refer to Step 3.
+        openshift_token: ${{ env.KUBERNETES_TOKEN }}
+
+        certificate_authority_data: ${{ env.KUBERNETES_CA }}
+
+        # Optional - this sets your Kubernetes context's current namespace after logging in.
+        namespace: ${{ inputs.app }}-dev
+  
+    - name: deploy
+      uses: 'deliverybot/helm@v1.7.0'
+      with:
+        helm: helm3
+        version: ${{ github.sha }}
+        release: ${{env.REPOSITORY_NAME}}
+        namespace: ${{ inputs.app }}-dev
+        chart: ".helm"
+        values: |
+          image: 
+            repository: ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }}
+            tag: ${{ github.sha }}
+          imagePullSecrets:
+          - name: github-dockercfg
+          repo:
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}          
+      env:
+        KUBECONFIG: '${{ env.KUBECONFIG }}'      
+
+    - name: integration tests (emulated)
+      run: |
+        echo noop
+
+  deploy-qa:
+    runs-on: [self-hosted, "${{ inputs.app }}"]
+    needs: deploy-dev
+    steps:
+    - name: set repo name
+      shell: bash
+      run: | 
+        echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
+    - name: set ocp token
+      shell: bash
+      run: | 
+        echo "KUBERNETES_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" >> $GITHUB_ENV
+        echo "KUBERNETES_CA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)" >> $GITHUB_ENV        
+    - name: checkout code
+      uses: actions/checkout@v2        
+    - name: kubernetes login
+      uses: redhat-actions/oc-login@v1
+      with:
+        # URL to your OpenShift cluster.
+        # Refer to Step 2.
+        openshift_server_url: https://kubernetes.default.svc:443
+
+        # Authentication Token. Can use username and password instead.
+        # Refer to Step 3.
+        openshift_token: ${{ env.KUBERNETES_TOKEN }}
+
+        certificate_authority_data: ${{ env.KUBERNETES_CA }}
+
+        # Optional - this sets your Kubernetes context's current namespace after logging in.
+        namespace: ${{ inputs.app }}-qa      
+ 
+    - name: deploy
+      uses: 'deliverybot/helm@v1.7.0'
+      with:
+        helm: helm3
+        version: ${{ github.sha }}
+        release: ${{env.REPOSITORY_NAME}}
+        namespace: ${{ inputs.app }}-qa
+        chart: "./.helm"
+        values: |
+          image: 
+            repository: ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }}
+            tag: ${{ github.sha }}
+          imagePullSecrets:
+          - name: github-dockercfg
+          repo:
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}                      
+      env:
+        KUBECONFIG: '${{ env.KUBECONFIG }}'     
+
+    - name: integration tests (emulated)
+      run:
+        echo noop
+
+
+  deploy-prod:
+    runs-on: [self-hosted, "${{ inputs.app }}"]
+    needs: deploy-qa
+    steps:
+    - name: set repo name
+      shell: bash
+      run: | 
+        echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
+    - name: set ocp token
+      shell: bash
+      run: | 
+        echo "KUBERNETES_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" >> $GITHUB_ENV    
+        echo "KUBERNETES_CA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)" >> $GITHUB_ENV     
+    - name: checkout code
+      uses: actions/checkout@v2        
+    - name: Install CLI tools from OpenShift Mirror
+      uses: redhat-actions/openshift-tools-installer@v1
+      with:
+        # Installs the latest release of oc with the major version 3.
+        # This is equivalent to "3.x" or "^3".
+        oc: "4"      
+    - name: kubernetes login
+      uses: redhat-actions/oc-login@v1
+      with:
+        # URL to your OpenShift cluster.
+        # Refer to Step 2.
+        openshift_server_url: https://kubernetes.default.svc:443
+
+        # Authentication Token. Can use username and password instead.
+        # Refer to Step 3.
+        openshift_token: ${{ env.KUBERNETES_TOKEN }}
+
+        certificate_authority_data: ${{ env.KUBERNETES_CA }}
+
+        # Optional - this sets your Kubernetes context's current namespace after logging in.
+        namespace:  ${{ inputs.app }}-prod
+
+    - name: deploy
+      uses: 'deliverybot/helm@v1.7.0'
+      with:
+        helm: helm3
+        version: ${{ github.sha }}
+        release: ${{env.REPOSITORY_NAME}}
+        namespace: ${{ inputs.app }}-prod
+        chart: "./.helm"
+        values: |
+          image: 
+            repository: ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }}
+            tag: ${{ github.sha }}
+          imagePullSecrets:
+          - name: github-dockercfg
+          repo:
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}             
+      env:
+        KUBECONFIG: '${{ env.KUBECONFIG }}'       
+
+    - name: smoke test (emulated)
+      run: |
+        echo noop 
