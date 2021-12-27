@@ -42,6 +42,7 @@ jobs:
 
   image-build:
     runs-on: [self-hosted, "${{ inputs.app }}",buildah]
+    needs: image-build
     steps:
     - name: set repo name
       shell: bash
@@ -71,7 +72,7 @@ jobs:
 
   deploy-dev:
     runs-on: [self-hosted, "${{ inputs.app }}"]
-    needs: build
+    needs: image-build
     steps:
     - name: set repo name
       shell: bash
