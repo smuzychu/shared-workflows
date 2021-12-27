@@ -42,7 +42,7 @@ jobs:
 
   image-build:
     runs-on: [self-hosted, "${{ inputs.app }}",buildah]
-    needs: image-build
+    needs: java-build
     steps:
     - name: set repo name
       shell: bash
