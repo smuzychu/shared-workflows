@@ -10,7 +10,7 @@ on:
 
 jobs:
   java-build:
-    runs-on: [self-hosted, "${{ inputs.app }}",java]
+    runs-on: [self-hosted, "${{ inputs.app }}"]
     steps:
     - name: set repo name
       shell: bash
