@@ -87,26 +87,10 @@ jobs:
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) template ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -n ${{ inputs.app }}-build --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }} --set github.pat=${{ github.token }}
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-build --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }} --set github.pat=${{ github.token }}
 
-    # - name: deploy
-    #   uses: 'deliverybot/helm@v1.7.0' 
-    #   with:
-    #     helm: helm3
-    #     version: ${{ github.sha }}
-    #     release: ${{env.REPOSITORY_NAME}}
-    #     namespace: ${{ inputs.app }}-build
-    #     chart: ".helm-quarkus-build"
-    #     values: |
-    #       github:
-    #         owner: ${{ github.repository_owner }}
-    #         repo_name: ${{ env.REPOSITORY_NAME }}
-    #         commit_sha: ${{ github.sha }}                     
-    #   env:
-    #     KUBECONFIG: '${{ env.KUBECONFIG }}'
-
     - name: start and follow the build
       shell: bash
       run: | 
-        oc start-build ${{ env.REPOSITORY_NAME }}-quarkus-build -F
+        oc start-build ${{ env.REPOSITORY_NAME }}-quarkus-build -F -n ${{ inputs.app }}-build
 
   deploy-dev:
     runs-on: [self-hosted, "${{ inputs.app }}"]
@@ -116,43 +100,21 @@ jobs:
       shell: bash
       run: | 
         echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
-    - name: set ocp token
+    
+    - name: Install CLI tools from OpenShift Mirror
+      uses: redhat-actions/openshift-tools-installer@v1
+      with:
+        oc: "4"
+        helm: "3.6.2"
+        skip_cache: true
+                
+    - name: checkout code
+      uses: actions/checkout@v2
+  
+    - name: deploy build-config
       shell: bash
       run: | 
-        echo "KUBERNETES_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" >> $GITHUB_ENV
-        echo "KUBERNETES_CA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)" >> $GITHUB_ENV        
-    - name: checkout code
-      uses: actions/checkout@v2             
-    - name: kubernetes login
-      uses: redhat-actions/oc-login@v1
-      with:
-        # URL to your OpenShift cluster.
-        # Refer to Step 2.
-        openshift_server_url: https://kubernetes.default.svc:443
-
-        # Authentication Token. Can use username and password instead.
-        # Refer to Step 3.
-        openshift_token: ${{ env.KUBERNETES_TOKEN }}
-
-        certificate_authority_data: ${{ env.KUBERNETES_CA }}
-
-        # Optional - this sets your Kubernetes context's current namespace after logging in.
-        namespace: ${{ inputs.app }}-dev
-  
-    - name: deploy
-      uses: 'deliverybot/helm@v1.7.0'
-      with:
-        helm: helm3
-        version: ${{ github.sha }}
-        release: ${{env.REPOSITORY_NAME}}
-        namespace: ${{ inputs.app }}-dev
-        chart: ".helm"
-        values: |
-          image: 
-            repository: ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }}
-            tag: ${{ github.sha }}         
-      env:
-        KUBECONFIG: '${{ env.KUBECONFIG }}'      
+        helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-dev --set image.repository=ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }}     
 
     - name: integration tests (emulated)
       run: |
@@ -166,46 +128,23 @@ jobs:
       shell: bash
       run: | 
         echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
-    - name: set ocp token
+    - name: Install CLI tools from OpenShift Mirror
+      uses: redhat-actions/openshift-tools-installer@v1
+      with:
+        oc: "4"
+        helm: "3.6.2"
+        skip_cache: true
+                
+    - name: checkout code
+      uses: actions/checkout@v2
+  
+    - name: deploy build-config
       shell: bash
       run: | 
-        echo "KUBERNETES_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" >> $GITHUB_ENV
-        echo "KUBERNETES_CA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)" >> $GITHUB_ENV        
-    - name: checkout code
-      uses: actions/checkout@v2        
-    - name: kubernetes login
-      uses: redhat-actions/oc-login@v1
-      with:
-        # URL to your OpenShift cluster.
-        # Refer to Step 2.
-        openshift_server_url: https://kubernetes.default.svc:443
-
-        # Authentication Token. Can use username and password instead.
-        # Refer to Step 3.
-        openshift_token: ${{ env.KUBERNETES_TOKEN }}
-
-        certificate_authority_data: ${{ env.KUBERNETES_CA }}
-
-        # Optional - this sets your Kubernetes context's current namespace after logging in.
-        namespace: ${{ inputs.app }}-qa      
- 
-    - name: deploy
-      uses: 'deliverybot/helm@v1.7.0'
-      with:
-        helm: helm3
-        version: ${{ github.sha }}
-        release: ${{env.REPOSITORY_NAME}}
-        namespace: ${{ inputs.app }}-qa
-        chart: "./.helm"
-        values: |
-          image: 
-            repository: ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }}
-            tag: ${{ github.sha }}                     
-      env:
-        KUBECONFIG: '${{ env.KUBECONFIG }}'     
+        helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-qa --set image.repository=ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }}     
 
     - name: integration tests (emulated)
-      run:
+      run: |
         echo noop
 
 
@@ -217,50 +156,21 @@ jobs:
       shell: bash
       run: | 
         echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
-    - name: set ocp token
-      shell: bash
-      run: | 
-        echo "KUBERNETES_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" >> $GITHUB_ENV    
-        echo "KUBERNETES_CA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)" >> $GITHUB_ENV     
-    - name: checkout code
-      uses: actions/checkout@v2        
     - name: Install CLI tools from OpenShift Mirror
       uses: redhat-actions/openshift-tools-installer@v1
       with:
-        # Installs the latest release of oc with the major version 3.
-        # This is equivalent to "3.x" or "^3".
-        oc: "4"      
-    - name: kubernetes login
-      uses: redhat-actions/oc-login@v1
-      with:
-        # URL to your OpenShift cluster.
-        # Refer to Step 2.
-        openshift_server_url: https://kubernetes.default.svc:443
+        oc: "4"
+        helm: "3.6.2"
+        skip_cache: true
+                
+    - name: checkout code
+      uses: actions/checkout@v2
+  
+    - name: deploy build-config
+      shell: bash
+      run: | 
+        helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-prod --set image.repository=ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }}     
 
-        # Authentication Token. Can use username and password instead.
-        # Refer to Step 3.
-        openshift_token: ${{ env.KUBERNETES_TOKEN }}
-
-        certificate_authority_data: ${{ env.KUBERNETES_CA }}
-
-        # Optional - this sets your Kubernetes context's current namespace after logging in.
-        namespace:  ${{ inputs.app }}-prod
-
-    - name: deploy
-      uses: 'deliverybot/helm@v1.7.0'
-      with:
-        helm: helm3
-        version: ${{ github.sha }}
-        release: ${{env.REPOSITORY_NAME}}
-        namespace: ${{ inputs.app }}-prod
-        chart: "./.helm"
-        values: |
-          image: 
-            repository: ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }}
-            tag: ${{ github.sha }}            
-      env:
-        KUBECONFIG: '${{ env.KUBECONFIG }}'       
-
-    - name: smoke test (emulated)
+    - name: integration tests (emulated)
       run: |
-        echo noop 
+        echo noop
