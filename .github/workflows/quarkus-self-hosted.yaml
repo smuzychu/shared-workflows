@@ -49,13 +49,23 @@ jobs:
       shell: bash
       run: | 
         echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
+        
     - name: set ocp token
       shell: bash
       run: | 
         echo "KUBERNETES_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" >> $GITHUB_ENV
-        echo "KUBERNETES_CA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)" >> $GITHUB_ENV        
+        echo "KUBERNETES_CA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)" >> $GITHUB_ENV
+    
+    - name: Install CLI tools from OpenShift Mirror
+      uses: redhat-actions/openshift-tools-installer@v1
+      with:
+        oc: "4"
+        helm: "3.7.2"
+        skip_cache: true
+                
     - name: checkout code
-      uses: actions/checkout@v2             
+      uses: actions/checkout@v2
+
     - name: kubernetes login
       uses: redhat-actions/oc-login@v1
       with:
@@ -72,21 +82,26 @@ jobs:
         # Optional - this sets your Kubernetes context's current namespace after logging in.
         namespace: ${{ inputs.app }}-build       
 
-    - name: deploy
-      uses: 'deliverybot/helm@v1.7.0'
-      with:
-        helm: helm3
-        version: ${{ github.sha }}
-        release: ${{env.REPOSITORY_NAME}}
-        namespace: ${{ inputs.app }}-build
-        chart: ".helm-quarkus-build"
-        values: |
-          github:
-            owner: ${{ github.repository_owner }}
-            repo_name: ${{ env.REPOSITORY_NAME }}
-            commit_sha: ${{ github.sha }}                     
-      env:
-        KUBECONFIG: '${{ env.KUBECONFIG }}'
+    - name: deploy build-config
+      shell: bash
+      run: | 
+        helm upgrade ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-build --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }}
+
+    # - name: deploy
+    #   uses: 'deliverybot/helm@v1.7.0' 
+    #   with:
+    #     helm: helm3
+    #     version: ${{ github.sha }}
+    #     release: ${{env.REPOSITORY_NAME}}
+    #     namespace: ${{ inputs.app }}-build
+    #     chart: ".helm-quarkus-build"
+    #     values: |
+    #       github:
+    #         owner: ${{ github.repository_owner }}
+    #         repo_name: ${{ env.REPOSITORY_NAME }}
+    #         commit_sha: ${{ github.sha }}                     
+    #   env:
+    #     KUBECONFIG: '${{ env.KUBECONFIG }}'
 
     - name: start and follow the build
       shell: bash
