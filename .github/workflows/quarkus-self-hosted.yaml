@@ -84,7 +84,7 @@ jobs:
     - name: deploy build-config
       shell: bash
       run: | 
-        helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) template ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-build --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }} --set github.pat=${{ github.token }}
+        helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) template ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -n ${{ inputs.app }}-build --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }} --set github.pat=${{ github.token }}
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-build --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }} --set github.pat=${{ github.token }}
 
     # - name: deploy
