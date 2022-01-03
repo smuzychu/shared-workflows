@@ -60,7 +60,7 @@ jobs:
       uses: redhat-actions/openshift-tools-installer@v1
       with:
         oc: "4"
-        helm: "3.7.2"
+        helm: "3.6.2"
         skip_cache: true
                 
     - name: checkout code
