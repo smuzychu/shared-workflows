@@ -106,7 +106,7 @@ jobs:
     - name: start and follow the build
       shell: bash
       run: | 
-        oc start-build ${{ env.REPOSITORY_NAME }} -F
+        oc start-build ${{ env.REPOSITORY_NAME }}-quarkus-build -F
 
   deploy-dev:
     runs-on: [self-hosted, "${{ inputs.app }}"]
