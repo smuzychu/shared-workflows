@@ -6,7 +6,9 @@ on:
         description: 'the name of the app this repo belongs to'
         required: true
         type: string
-    secrets: {}
+    secrets:
+      repo_pat:
+        required: true
 
 jobs:
   java-build:
@@ -85,7 +87,7 @@ jobs:
     - name: deploy build-config
       shell: bash
       run: | 
-        helm --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-build --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }}
+        helm --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-build --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }} --set github.pat=${{ secrets.repo_pat }}
 
     # - name: deploy
     #   uses: 'deliverybot/helm@v1.7.0' 
