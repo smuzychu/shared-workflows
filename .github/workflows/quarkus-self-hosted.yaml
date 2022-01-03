@@ -50,11 +50,11 @@ jobs:
       run: | 
         echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
 
-    - name: set ocp token
-      shell: bash
-      run: | 
-        echo "KUBERNETES_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" >> $GITHUB_ENV
-        echo "KUBERNETES_CA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)" >> $GITHUB_ENV
+    # - name: set ocp token
+    #   shell: bash
+    #   run: | 
+    #     echo "KUBERNETES_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" >> $GITHUB_ENV
+    #     echo "KUBERNETES_CA=$(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)" >> $GITHUB_ENV
     
     - name: Install CLI tools from OpenShift Mirror
       uses: redhat-actions/openshift-tools-installer@v1
