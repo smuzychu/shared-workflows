@@ -49,7 +49,7 @@ jobs:
       shell: bash
       run: | 
         echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
-        
+
     - name: set ocp token
       shell: bash
       run: | 
@@ -66,26 +66,26 @@ jobs:
     - name: checkout code
       uses: actions/checkout@v2
 
-    - name: kubernetes login
-      uses: redhat-actions/oc-login@v1
-      with:
-        # URL to your OpenShift cluster.
-        # Refer to Step 2.
-        openshift_server_url: https://kubernetes.default.svc:443
+    # - name: kubernetes login
+    #   uses: redhat-actions/oc-login@v1
+    #   with:
+    #     # URL to your OpenShift cluster.
+    #     # Refer to Step 2.
+    #     openshift_server_url: https://kubernetes.default.svc:443
 
-        # Authentication Token. Can use username and password instead.
-        # Refer to Step 3.
-        openshift_token: ${{ env.KUBERNETES_TOKEN }}
+    #     # Authentication Token. Can use username and password instead.
+    #     # Refer to Step 3.
+    #     openshift_token: ${{ env.KUBERNETES_TOKEN }}
 
-        certificate_authority_data: ${{ env.KUBERNETES_CA }}
+    #     certificate_authority_data: ${{ env.KUBERNETES_CA }}
 
-        # Optional - this sets your Kubernetes context's current namespace after logging in.
-        namespace: ${{ inputs.app }}-build       
+    #     # Optional - this sets your Kubernetes context's current namespace after logging in.
+    #     namespace: ${{ inputs.app }}-build       
 
     - name: deploy build-config
       shell: bash
       run: | 
-        helm upgrade ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-build --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }}
+        helm --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm-quarkus-build -i -n ${{ inputs.app }}-build --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }}
 
     # - name: deploy
     #   uses: 'deliverybot/helm@v1.7.0' 
