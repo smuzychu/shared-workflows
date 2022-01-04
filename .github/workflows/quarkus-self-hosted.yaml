@@ -89,7 +89,7 @@ jobs:
     - name: start and follow the build
       shell: bash
       run: | 
-        oc start-build ${{ env.REPOSITORY_NAME }}-${{ env.REPOSITORY_NAME }}-quarkus-build -F -n ${{ inputs.app }}-build
+        oc start-build ${{ env.REPOSITORY_NAME }}-${{ env.REPOSITORY_NAME }}-build -F -n ${{ inputs.app }}-build
 
   deploy-dev:
     runs-on: [self-hosted, "${{ inputs.app }}"]
