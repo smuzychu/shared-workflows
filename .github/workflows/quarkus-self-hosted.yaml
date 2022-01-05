@@ -110,7 +110,7 @@ jobs:
     - name: checkout code
       uses: actions/checkout@v2
   
-    - name: deploy build-config
+    - name: deploy deploy app
       shell: bash
       run: | 
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm -i -n ${{ inputs.app }}-dev --set image.repository=ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }}     
@@ -137,7 +137,7 @@ jobs:
     - name: checkout code
       uses: actions/checkout@v2
   
-    - name: deploy build-config
+    - name: deploy app
       shell: bash
       run: | 
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm -i -n ${{ inputs.app }}-qa --set image.repository=ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }}     
@@ -165,7 +165,7 @@ jobs:
     - name: checkout code
       uses: actions/checkout@v2
   
-    - name: deploy build-config
+    - name: deploy deploy app
       shell: bash
       run: | 
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) upgrade ${{ env.REPOSITORY_NAME }} ./.helm -i -n ${{ inputs.app }}-prod --set image.repository=ghcr.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }}     
