@@ -1,0 +1,61 @@
+{{- define "metric_labels.array" -}}
+{{ range $key,$value := . -}} 
+{{ $key }}: "{{ $value }}" 
+{{- end }}
+{{- end -}}
+
+{{- $destination_service_name := (list (default .Chart.Name .Values.nameOverride) .Release.Namespace "svc.cluster.local") | join "." }}
+
+{{- $labels := dict "destination_service_namespace" .Release.Namespace}}
+
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ $destination_service_name }}-alerts
+  {{- with .Values.podAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 8 }}
+  {{- end }}
+  labels:
+    {{- include ".helm.selectorLabels" . | nindent 8 }}
+spec:
+  groups:
+  - name: SLOs-{{ .Release.Namespace }}={{ $destination_service_name }}
+    rules:  
+  {{- $params := .Values }}
+  {{- $release := .Release }}
+  {{- $destination_service := (list .Release.Namespace $destination_service_name | join  "_" ) | replace "." "_" | replace "-" "_" }}
+  {{- range $alert_key,$alert := .Values.alerts -}}
+  {{- range $speed_key,$speed := $alert.speeds -}}
+  {{- range $window_key,$window := $speed.windows }}    
+      - expr: |
+          ( 
+            sum(rate(istio_request_duration_milliseconds_count{destination_service_name_namespace="{{ $release.Namespace }}",destination_service_name="{{ $destination_service_name }}"}[{{ $window }}])) -
+            sum(rate(istio_request_duration_milliseconds_bucket{destination_service_name_namespace="{{ $release.Namespace }}",destination_service_name="{{ $destination_service_name }}",response_code!~"5.*",le="{{ $params.latency }}"}[{{ $window }}]))
+          )
+          /
+          sum(rate(istio_request_duration_milliseconds_count{destination_service_name_namespace="{{ $release.Namespace }}",destination_service="{{ $destination_service_name }}"}[{{ $window }}]))
+        labels:
+          {{ template "metric_labels.array" $labels }}
+          service: {{ $destination_service_name }}
+        record: virtual_service:{{ $destination_service }}:error_rate_{{ $window }}
+  {{- end -}}
+  {{- end }}
+      - alert: ErrorBudgetBurn-{{ $release.Namespace }}={{ $destination_service_name }}
+        expr: |
+          (
+            virtual_service:{{ $destination_service }}:error_rate_{{ $alert.speeds.fast.windows.long }} > ({{ $alert.speeds.fast.burn_rate_percent }}/100*(1-({{ $params.slo_percent }}/100)))
+            and
+            virtual_service:{{ $destination_service }}:error_rate_{{ $alert.speeds.fast.windows.short }} > ({{ $alert.speeds.fast.burn_rate_percent }}/100*(1-({{ $params.slo_percent }}/100)))
+          )
+          or
+          (
+            virtual_service:{{ $destination_service }}:error_rate_{{ $alert.speeds.slow.windows.long }} > ({{ $alert.speeds.slow.burn_rate_percent }}/100*(1-({{ $params.slo_percent }}/100)))
+            and
+            virtual_service:{{ $destination_service }}:error_rate_{{ $alert.speeds.slow.windows.short }} > ({{ $alert.speeds.slow.burn_rate_percent }}/100*(1-({{ $params.slo_percent }}/100)))
+          )
+        labels:
+          {{ template "metric_labels.array" $labels }}
+          severity: {{ $alert.severity }}
+          service: {{ $destination_service_name }}
+  {{- end -}}

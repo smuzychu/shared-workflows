@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {{ include ".helm.fullname" . }}
+  labels:
+    {{- include ".helm.labels" . | nindent 4 }}
+    replace_basedomain: "true"
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}  
+spec:
+  gateways:
+    - istio-system/mesh-gateway
+  hosts:
+    - >-
+      {{ include ".helm.fullname" . }}-{{ .Release.Namespace }}.mesh.apps.dummy
+  http:
+    - route:
+        - destination:
+            host: {{ include ".helm.fullname" . }}
+            port:
+              number: 8080
