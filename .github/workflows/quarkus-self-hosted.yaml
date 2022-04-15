@@ -87,7 +87,7 @@ jobs:
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
         upgrade --repo https://raf-backstage-org.github.io/shared-workflows --version "0.1.0" ${{ env.REPOSITORY_NAME }} quarkus-build -i -n ${{ inputs.app }}-build \
         --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }} --set github.pat=${{ github.token }} \
-        --set nameOverride ${{ inputs.app }}
+        --set nameOverride=${{ inputs.app }}
 
     - name: start and follow the build
       shell: bash
@@ -119,7 +119,7 @@ jobs:
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
         upgrade --repo https://raf-backstage-org.github.io/shared-workflows --version "0.1.0" ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-dev \
         --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
-        --set nameOverride ${{ inputs.app }}
+        --set nameOverride=${{ inputs.app }}
 
     - name: integration tests (emulated)
       run: |
@@ -149,7 +149,7 @@ jobs:
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
         upgrade --repo https://raf-backstage-org.github.io/shared-workflows --version "0.1.0" ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-qa \
         --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
-        --set nameOverride ${{ inputs.app }}
+        --set nameOverride=${{ inputs.app }}
 
     - name: integration tests (emulated)
       run: |
@@ -180,8 +180,8 @@ jobs:
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
         upgrade --repo https://raf-backstage-org.github.io/shared-workflows --version "0.1.0" ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-qa \
         --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
-        --set nameOverride ${{ inputs.app }}
-        
+        --set nameOverride=${{ inputs.app }}
+
     - name: integration tests (emulated)
       run: |
         echo noop
