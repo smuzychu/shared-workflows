@@ -21,4 +21,6 @@ spec:
     type: Git
     git:
       uri: 'https://github.com/{{ .Values.github.owner }}/{{ .Values.github.repo_name }}'
+    sourceSecret:
+      name: "{{ include "quarkus-build.fullname" . }}-repo-auth"
   runPolicy: Serial
