@@ -24,16 +24,26 @@ jobs:
       with:
         java-version: 11
 
-    - name: Static code check (Emulated)
-      run: |
-        echo noop
+    - name: Cache SonarQube packages
+      uses: actions/cache@v2
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar        
 
     - name: Cache Maven packages
       uses: actions/cache@v2
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
+        restore-keys: ${{ runner.os }}-m2        
+
+    - name: Build and analyze
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ env.SONARQUBE_TOKEN }}
+        SONAR_HOST_URL: http://sonarqube.sonarqube.svc:9000
+      run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=raf-backstage-demo_brian-qrs_AYCKkk_bQsmkU4e2lDIh
 
     - name: Build
       run: |
