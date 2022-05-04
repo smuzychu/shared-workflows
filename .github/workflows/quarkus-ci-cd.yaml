@@ -132,7 +132,7 @@ jobs:
       shell: bash
       run: | 
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-        upgrade --repo https://raf-backstage-demo.github.io/shared-workflows --version "0.1.1" ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-dev \
+        upgrade --repo https://raf-backstage-demo.github.io/shared-workflows ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-dev \
         --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
         --set nameOverride=${{ env.REPOSITORY_NAME }}
 
@@ -162,7 +162,7 @@ jobs:
       shell: bash
       run: | 
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-        upgrade --repo https://raf-backstage-demo.github.io/shared-workflows --version "0.1.1" ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-qa \
+        upgrade --repo https://raf-backstage-demo.github.io/shared-workflows ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-qa \
         --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
         --set nameOverride=${{ env.REPOSITORY_NAME }}
 
@@ -193,7 +193,7 @@ jobs:
       shell: bash
       run: | 
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-        upgrade --repo https://raf-backstage-demo.github.io/shared-workflows --version "0.1.1" ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-prod \
+        upgrade --repo https://raf-backstage-demo.github.io/shared-workflows ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-prod \
         --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
         --set nameOverride=${{ env.REPOSITORY_NAME }}
 
