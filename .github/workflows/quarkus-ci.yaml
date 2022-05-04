@@ -50,7 +50,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
         SONAR_HOST_URL: http://sonarqube.sonarqube.svc:9000
-      run: ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ env.GITHUB_REPOSITORY_OWNER }}_${{ env.REPOSITORY_NAME }}
+      run: ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ github.repository_owner }}_${{ env.REPOSITORY_NAME }}
 
     - name: Build
       run: |
