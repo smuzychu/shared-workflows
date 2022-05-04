@@ -14,7 +14,12 @@ jobs:
     - name: set repo name
       shell: bash
       run: | 
-        echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV        
+        echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
+
+    - name: set sonarqube token
+      shell: bash
+      run: | 
+        echo "SONAR_TOKEN=$(cat /github/home/_sonarqube/SONAR_TOKEN)" >> $GITHUB_ENV             
 
     - name: checkout code
       uses: actions/checkout@v2
@@ -43,7 +48,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
         SONAR_HOST_URL: http://sonarqube.sonarqube.svc:9000
-      run: ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey={{ env.GITHUB_REPOSITORY_OWNER }}_{{ env.REPOSITORY_NAME }}
+      run: ./mvnw -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=${{ env.GITHUB_REPOSITORY_OWNER }}_${{ env.REPOSITORY_NAME }}
 
     - name: Build
       run: |
