@@ -19,7 +19,7 @@ jobs:
     - name: set sonarqube token
       shell: bash
       run: | 
-        echo "SONAR_TOKEN=$(cat /github/home/_sonarqube/SONAR_TOKEN)" >> $GITHUB_ENV              
+        echo "SONAR_TOKEN=$(cat /github/home/_sonarqube/SONARQUBE_TOKEN)" >> $GITHUB_ENV              
 
     - name: checkout code
       uses: actions/checkout@v2
