@@ -4,7 +4,7 @@
 {{- end }}
 {{- end -}}
 
-{{- $destination_service_name := (list (default .Chart.Name .Values.nameOverride) .Release.Namespace "svc.cluster.local") | join "." }}
+{{- $destination_service_name := (default .Chart.Name .Values.nameOverride) }}
 
 {{- $labels := dict "destination_service_namespace" .Release.Namespace}}
 
