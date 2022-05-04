@@ -100,7 +100,7 @@ jobs:
       shell: bash
       run: | 
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-        upgrade --repo https://raf-backstage-demo.github.io/shared-workflows --version "0.1.1" ${{ env.REPOSITORY_NAME }} quarkus-build -i -n ${{ inputs.app }}-build \
+        upgrade --repo https://raf-backstage-demo.github.io/shared-workflows --version "0.1.0" ${{ env.REPOSITORY_NAME }} quarkus-build -i -n ${{ inputs.app }}-build \
         --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }} --set github.pat=${{ github.token }} \
         --set nameOverride=${{ env.REPOSITORY_NAME }}
 
