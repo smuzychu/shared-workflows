@@ -22,6 +22,7 @@ spec:
   groups:
   - name: SLOs-{{ .Release.Namespace }}-{{ (default .Chart.Name .Values.nameOverride) }}
     rules:  
+  {{- $chart := .Chart }}  
   {{- $params := .Values }}
   {{- $release := .Release }}
   {{- $destination_service := (list .Release.Namespace $destination_service_name | join  "_" ) | replace "." "_" | replace "-" "_" }}
@@ -41,7 +42,7 @@ spec:
         record: virtual_service:{{ $destination_service }}:error_rate_{{ $window }}
   {{- end -}}
   {{- end }}
-      - alert: ErrorBudgetBurn-{{ $alert.severity }}-{{ .Release.Namespace }}-{{ (default .Chart.Name .Values.nameOverride) }}
+      - alert: ErrorBudgetBurn-{{ $alert.severity }}-{{ $release.Namespace }}-{{ (default $chart.Name $params.nameOverride) }}
         expr: |
           (
             virtual_service:{{ $destination_service }}:error_rate_{{ $alert.speeds.fast.windows.long }} > ({{ $alert.speeds.fast.burn_rate_percent }}/100*(1-({{ $params.slo_percent }}/100)))
