@@ -35,7 +35,7 @@ spec:
             sum(rate(istio_request_duration_milliseconds_bucket{destination_service_namespace="{{ $release.Namespace }}",destination_service_name="{{ $destination_service_name }}",response_code!~"5.*",le="{{ $params.latency }}"}[{{ $window }}]))
           )
           /
-          sum(rate(istio_request_duration_milliseconds_count{destination_service_namespace="{{ $release.Namespace }}",destination_service="{{ $destination_service_name }}"}[{{ $window }}]))
+          sum(rate(istio_request_duration_milliseconds_count{destination_service_namespace="{{ $release.Namespace }}",destination_service_name="{{ $destination_service_name }}"}[{{ $window }}]))
         labels:
           {{ template "metric_labels.array" $labels }}
           service: {{ $destination_service_name }}
