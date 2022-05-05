@@ -83,7 +83,7 @@ tolerations: []
 affinity: {}
 
 slo_percent: 99.99
-latency: 1
+latency: 1000
 
 alerts:
 - severity: critical
