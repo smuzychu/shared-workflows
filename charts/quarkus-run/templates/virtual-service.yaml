@@ -16,6 +16,13 @@ spec:
     - >-
       {{ include ".helm.fullname" . }}-{{ .Release.Namespace }}.mesh.apps.dummy
   http:
+{{ if (hasSuffix "-prod" .Release.Namespace) }}  
+    - fault:
+        abort:
+          httpStatus: 500
+          percentage:
+            value: 5 
+  {{- end }}              
     - route:
         - destination:
             host: {{ include ".helm.fullname" . }}
