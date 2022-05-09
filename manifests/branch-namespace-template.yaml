@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ${name}
+  labels:
+    app : ${application}
+    team: ${owner}
+    build-namespace: ${application}-build
+    size: small
+    environment: branch
+    goldilocks.fairwinds.com/enabled: "true"

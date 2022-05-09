@@ -1,0 +1,95 @@
+name: Branch Management
+
+on:
+  create: {}
+  delete: {}
+
+jobs:
+  namespace-creation:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Inject slug/short variables
+      uses: rlespinasse/github-slug-action@v4
+
+    - name: checkout code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        path: component
+
+    - name: "Check if catalog-info.yaml exists"
+      id: is-component
+      uses: andstor/file-existence-action@v1
+      with:
+        files: "./component/catalo-info.yaml"
+
+    - name: Install Helm
+      if: steps.is-component.outputs.files_exists == 'true'
+      uses: redhat-actions/openshift-tools-installer@v1
+      with:
+        helm: "3.6.2"
+        skip_cache: true
+
+    - name: get application
+      if: steps.is-component.outputs.files_exists == 'true'
+      id: application
+      uses: KJ002/read-yaml@main      # You may wish to replace main with a version tag such as '1.6' etc.
+      with:
+        file: './component/catalo-info.yaml'          # File to read from
+        key-path: '["spec", "system"]' 
+
+    - name: get owner
+      if: steps.is-component.outputs.files_exists == 'true'
+      id: owner
+      uses: KJ002/read-yaml@main      # You may wish to replace main with a version tag such as '1.6' etc.
+      with:
+        file: './component/catalo-info.yaml'          # File to read from
+        key-path: '["spec", "owner"]'              
+
+    - name: checkout code
+      uses: actions/checkout@v2
+      if: steps.is-component.outputs.files_exists == 'true'
+      with:
+        fetch-depth: 0
+        repository: https://github.com/raf-backstage-demo/allowed-namespaces
+        path: allowed-namespaces
+
+    - name: checkout code
+      uses: actions/checkout@v2
+      if: steps.is-component.outputs.files_exists == 'true'
+      with:
+        fetch-depth: 0
+        repository: https://github.com/raf-backstage-demo/shared-workflows
+        path: shared-workflows        
+
+    - name: create namespace
+      shell: bash
+      if: steps.is-component.outputs.files_exists == 'true' &&  github.event_name == 'create' 
+      env: 
+        application: ${{ step.owner.application.data }}
+        component: ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}
+        branch: ${{ env.GITHUB_EVENT_REF_SLUG_URL }}
+        owner: ${{ step.owner.outputs.data }}
+        name: ${{ step.owner.application.data }}-${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}-${{ env.GITHUB_EVENT_REF_SLUG_URL }}
+      run: |
+        mkdir -p ./allowed-namespaces/branch-namespaces
+        envsubst < ./shared-workflows/manifests/branch-namespace-template.yaml > ./allowed-namespaces/branch-namespaces/${name}.yaml
+
+    - name: delete namespace
+      shell: bash
+      if: steps.is-component.outputs.files_exists == 'true' &&  github.event_name == 'delete' 
+      env: 
+        application: ${{ step.owner.application.data }}
+        component: ${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}
+        branch: ${{ env.GITHUB_EVENT_REF_SLUG_URL }}
+        owner: ${{ step.owner.outputs.data }}
+        name: ${{ step.owner.application.data }}-${{ env.GITHUB_REPOSITORY_NAME_PART_SLUG }}-${{ env.GITHUB_EVENT_REF_SLUG_URL }}
+      run: | 
+        rm ./allowed-namespaces/branch-namespaces/${name}.yaml
+
+    - name: commit changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      if: steps.is-component.outputs.files_exists == 'true'
+      with:
+        repository: ./allowed-namespaces 
