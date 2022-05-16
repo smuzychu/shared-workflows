@@ -15,16 +15,16 @@ spec:
   hosts:
     - >-
       {{ include ".helm.fullname" . }}-{{ .Release.Namespace }}.mesh.apps.dummy
-  http:
-{{ if (hasSuffix "-prod" .Release.Namespace) }}  
-    - fault:
-        abort:
-          httpStatus: 500
-          percentage:
-            value: 5 
-  {{- end }}              
+  http:             
     - route:
         - destination:
             host: {{ include ".helm.fullname" . }}
             port:
               number: 8080
+{{ if (hasSuffix "-prod" .Release.Namespace) }}  
+      fault:
+        abort:
+          httpStatus: 500
+          percentage:
+            value: 5 
+{{- end }}               
