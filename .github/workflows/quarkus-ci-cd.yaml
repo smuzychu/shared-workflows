@@ -133,14 +133,14 @@ jobs:
         source: github     
                 
     - name: checkout application gitops repo
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: raf-backstage-demo/${{ inputs.app }}-gitops
   
     - name: update image version
       shell: bash
       run: | 
-        yq -i '.spec.source.helm.values |= "quarkus-run: \n  image:\n    tag: ciao\n"' components/${{ env.REPOSITORY_NAME }}-argcd-app-dev.yaml
+        yq -i '.spec.source.helm.values |= "quarkus-run: \n  image:\n    tag: ${{ github.sha }}\n"' $GITHUB_WORKSPACE/components/${{ env.REPOSITORY_NAME }}-argcd-app-dev.yaml
         # helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
         # upgrade --repo https://raf-backstage-demo.github.io/shared-workflows ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-dev \
         # --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
