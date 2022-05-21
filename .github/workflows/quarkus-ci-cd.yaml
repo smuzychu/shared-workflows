@@ -125,19 +125,24 @@ jobs:
         helm: "3.6.2"
         skip_cache: true
                 
-    - name: checkout code
+    - name: checkout application gitops repo
       uses: actions/checkout@v2
       with:
         repository: raf-backstage-demo/${{ inputs.app }}
   
-    - name: commit image version to git
+    - name: update image version
       shell: bash
       run: | 
-        echo try
+        yq -i '.spec.source.helm.values |= "quarkus-run: \n  image:\n    tag: ciao\n"' components/${{ env.REPOSITORY_NAME }}-argcd-app-dev.yaml
         # helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
         # upgrade --repo https://raf-backstage-demo.github.io/shared-workflows ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-dev \
         # --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
         # --set nameOverride=${{ env.REPOSITORY_NAME }}
+
+    - name: push to application gitops repo
+      uses: ad-m/github-push-action@master
+      with:
+        repository: raf-backstage-demo/${{ inputs.app }}    
 
     - name: integration tests (emulated)
       run: |
