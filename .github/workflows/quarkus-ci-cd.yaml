@@ -118,13 +118,19 @@ jobs:
       run: | 
         echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
     
-    - name: Install CLI tools from OpenShift Mirror
+    # - name: Install CLI tools from OpenShift Mirror
+    #   uses: redhat-actions/openshift-tools-installer@v1
+    #   with:
+    #     oc: "4"
+    #     helm: "3.6.2"
+    #     skip_cache: true
+    #     yq: "v4.25.1"
+
+    - name: Install CLI tools from github
       uses: redhat-actions/openshift-tools-installer@v1
       with:
-        oc: "4"
-        helm: "3.6.2"
-        skip_cache: true
         yq: "v4.25.1"
+        source: github     
                 
     - name: checkout application gitops repo
       uses: actions/checkout@v2
