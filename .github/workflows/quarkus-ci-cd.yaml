@@ -155,14 +155,16 @@ jobs:
       run: |
         git config --local user.email "quarkus-ci+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
-        git commit -m "image update - release" -a
+        git -C $GITHUB_WORKSPACE remote set-url origin https://github-actions[bot]:$GITHUB_GITOPS_TOKEN@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git
+        git -C $GITHUB_WORKSPACE commit -m "image update - release" -a
+        git -C $GITHUB_WORKSPACE push
 
-    - name: push to application gitops repo
-      uses: ad-m/github-push-action@master
-      with:
-        repository: raf-backstage-demo/${{ inputs.app }}-gitops
-        github_token: ${{ env.GITHUB_GITOPS_TOKEN }}
-        directory: ${{ env.GITHUB_WORKSPACE }}
+    # - name: push to application gitops repo
+    #   uses: ad-m/github-push-action@master
+    #   with:
+    #     repository: raf-backstage-demo/${{ inputs.app }}-gitops
+    #     github_token: ${{ env.GITHUB_GITOPS_TOKEN }}
+    #     directory: ${{ env.GITHUB_WORKSPACE }}
 
     - name: integration tests (emulated)
       run: |
