@@ -162,7 +162,7 @@ jobs:
       with:
         repository: raf-backstage-demo/${{ inputs.app }}-gitops
         github_token: ${{ env.GITHUB_GITOPS_TOKEN }}
-        directory: $GITHUB_WORKSPACE
+        directory: ${{ env.GITHUB_WORKSPACE }}
 
     - name: integration tests (emulated)
       run: |
