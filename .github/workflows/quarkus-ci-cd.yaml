@@ -156,7 +156,7 @@ jobs:
         git config --local user.email "quarkus-ci+github-actions[bot]@users.noreply.github.com"
         git config --local user.name "github-actions[bot]"
         git -C $GITHUB_WORKSPACE commit -m "image update - release" -a
-        git -C $GITHUB_WORKSPACE push https://github-actions[bot]:$GITHUB_GITOPS_TOKEN@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
+        git -C $GITHUB_WORKSPACE push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
 
     # - name: push to application gitops repo
     #   uses: ad-m/github-push-action@master
