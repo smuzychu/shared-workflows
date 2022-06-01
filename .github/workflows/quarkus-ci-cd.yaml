@@ -148,11 +148,6 @@ jobs:
       shell: bash
       run: | 
         yq -i '.spec.source.helm.values |= "quarkus-run: \n  image:\n    tag: ${{ github.sha }}\n"' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml
-        cat $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml
-        # helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-        # upgrade --repo https://raf-backstage-demo.github.io/shared-workflows ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-dev \
-        # --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
-        # --set nameOverride=${{ env.REPOSITORY_NAME }}
 
     - name: Commit files
       run: |
@@ -181,24 +176,32 @@ jobs:
       shell: bash
       run: | 
         echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
-    - name: Install CLI tools from OpenShift Mirror
+
+    - name: Install CLI tools from github
       uses: redhat-actions/openshift-tools-installer@v1
       with:
-        oc: "4"
-        helm: "3.6.2"
-        skip_cache: true
+        yq: "v4.25.1"
+        source: github     
                 
-    - name: checkout code
+    - name: checkout application gitops repo
       uses: actions/checkout@v3
+      with:
+        repository: raf-backstage-demo/${{ inputs.app }}-gitops
+        persist-credentials: false
+        path: gitops
   
-    - name: deploy app
+    - name: update image version
       shell: bash
       run: | 
-        echo try
-        # helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-        # upgrade --repo https://raf-backstage-demo.github.io/shared-workflows ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-qa \
-        # --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
-        # --set nameOverride=${{ env.REPOSITORY_NAME }}
+        yq -i '.spec.source.helm.values |= "quarkus-run: \n  image:\n    tag: ${{ github.sha }}\n"' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml
+
+    - name: Commit files
+      run: |
+        set -x
+        git -C $GITHUB_WORKSPACE/gitops config --local user.email "quarkus-ci+github-actions[bot]@users.noreply.github.com"
+        git -C $GITHUB_WORKSPACE/gitops config --local user.name "github-actions[bot]"
+        git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release" -a
+        git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
 
     - name: integration tests (emulated)
       run: |
@@ -213,24 +216,32 @@ jobs:
       shell: bash
       run: | 
         echo "REPOSITORY_NAME=$(basename $GITHUB_REPOSITORY)" >> $GITHUB_ENV
-    - name: Install CLI tools from OpenShift Mirror
+
+    - name: Install CLI tools from github
       uses: redhat-actions/openshift-tools-installer@v1
       with:
-        oc: "4"
-        helm: "3.6.2"
-        skip_cache: true
+        yq: "v4.25.1"
+        source: github     
                 
-    - name: checkout code
+    - name: checkout application gitops repo
       uses: actions/checkout@v3
+      with:
+        repository: raf-backstage-demo/${{ inputs.app }}-gitops
+        persist-credentials: false
+        path: gitops
   
-    - name: deploy deploy app
+    - name: update image version
       shell: bash
       run: | 
-        echo try
-        # helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-        # upgrade --repo https://raf-backstage-demo.github.io/shared-workflows ${{ env.REPOSITORY_NAME }} quarkus-run -i -n ${{ inputs.app }}-prod \
-        # --set image.repository=quay.io/${{ github.repository_owner }}/${{ env.REPOSITORY_NAME }} --set image.tag=${{ github.sha }} \
-        # --set nameOverride=${{ env.REPOSITORY_NAME }}
+        yq -i '.spec.source.helm.values |= "quarkus-run: \n  image:\n    tag: ${{ github.sha }}\n"' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml
+
+    - name: Commit files
+      run: |
+        set -x
+        git -C $GITHUB_WORKSPACE/gitops config --local user.email "quarkus-ci+github-actions[bot]@users.noreply.github.com"
+        git -C $GITHUB_WORKSPACE/gitops config --local user.name "github-actions[bot]"
+        git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release" -a
+        git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
 
     - name: integration tests (emulated)
       run: |
