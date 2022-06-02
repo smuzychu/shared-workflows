@@ -147,14 +147,15 @@ jobs:
     - name: update image version
       shell: bash
       run: | 
-        yq -i '.spec.source.helm.values |= "quarkus-run: \n  image:\n    tag: ${{ github.sha }}\n"' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml
-
+        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml > /tmp/argo-app.yaml.tmp
+        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' argo-app.yaml.tmp
+        yq -i '.spec.source.helm.values |= load_str("/tmp/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml
     - name: Commit files
       run: |
         set -x
         git -C $GITHUB_WORKSPACE/gitops config --local user.email "quarkus-ci+github-actions[bot]@users.noreply.github.com"
         git -C $GITHUB_WORKSPACE/gitops config --local user.name "github-actions[bot]"
-        git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release" -a
+        git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release dev ${{ github.sha }}" -a
         git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
 
     # - name: push to application gitops repo
@@ -193,14 +194,16 @@ jobs:
     - name: update image version
       shell: bash
       run: | 
-        yq -i '.spec.source.helm.values |= "quarkus-run: \n  image:\n    tag: ${{ github.sha }}\n"' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml
+        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml > /tmp/argo-app.yaml.tmp
+        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' argo-app.yaml.tmp
+        yq -i '.spec.source.helm.values |= load_str("/tmp/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml
 
     - name: Commit files
       run: |
         set -x
         git -C $GITHUB_WORKSPACE/gitops config --local user.email "quarkus-ci+github-actions[bot]@users.noreply.github.com"
         git -C $GITHUB_WORKSPACE/gitops config --local user.name "github-actions[bot]"
-        git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release" -a
+        git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release qa ${{ github.sha }}" -a
         git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
 
     - name: integration tests (emulated)
@@ -233,14 +236,16 @@ jobs:
     - name: update image version
       shell: bash
       run: | 
-        yq -i '.spec.source.helm.values |= "quarkus-run: \n  image:\n    tag: ${{ github.sha }}\n"' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml
+        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml > /tmp/argo-app.yaml.tmp
+        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' argo-app.yaml.tmp
+        yq -i '.spec.source.helm.values |= load_str("/tmp/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml
 
     - name: Commit files
       run: |
         set -x
         git -C $GITHUB_WORKSPACE/gitops config --local user.email "quarkus-ci+github-actions[bot]@users.noreply.github.com"
         git -C $GITHUB_WORKSPACE/gitops config --local user.name "github-actions[bot]"
-        git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release" -a
+        git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release - prod ${{ github.sha }}" -a
         git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
 
     - name: integration tests (emulated)
