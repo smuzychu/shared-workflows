@@ -147,10 +147,8 @@ jobs:
     - name: update image version
       shell: bash
       run: | 
-        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml > $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
-        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
-        yq -i '.spec.source.helm.values |= load_str("$GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml
-        rm $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
+        sed -i "s/            tag: [a-zA-Z0-9]*/            tag: ${{ github.sha }}/g" $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml
+    
     - name: Commit files
       run: |
         set -x
@@ -158,13 +156,6 @@ jobs:
         git -C $GITHUB_WORKSPACE/gitops config --local user.name "github-actions[bot]"
         git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release dev ${{ github.sha }}" -a
         git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
-
-    # - name: push to application gitops repo
-    #   uses: ad-m/github-push-action@master
-    #   with:
-    #     repository: raf-backstage-demo/${{ inputs.app }}-gitops
-    #     github_token: ${{ env.GITHUB_GITOPS_TOKEN }}
-    #     directory: ${{ env.GITHUB_WORKSPACE }}
 
     - name: integration tests (emulated)
       run: |
@@ -195,10 +186,7 @@ jobs:
     - name: update image version
       shell: bash
       run: | 
-        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml > $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
-        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
-        yq -i '.spec.source.helm.values |= load_str("$GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml
-        rm $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
+        sed -i "s/            tag: [a-zA-Z0-9]*/            tag: ${{ github.sha }}/g" $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml
 
     - name: Commit files
       run: |
@@ -238,10 +226,7 @@ jobs:
     - name: update image version
       shell: bash
       run: | 
-        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml > $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
-        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
-        yq -i '.spec.source.helm.values |= load_str("$GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml
-        rm $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
+        sed -i "s/            tag: [a-zA-Z0-9]*/            tag: ${{ github.sha }}/g" $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml
 
     - name: Commit files
       run: |
