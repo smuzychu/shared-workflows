@@ -18,9 +18,15 @@ spec:
   http:             
     - route:
         - destination:
-            host: {{ include ".helm.fullname" . }}
+            host: {{ include ".helm.fullname" . }}-canary
             port:
               number: 8080
+          weight: 0
+        - destination:
+            host: {{ include ".helm.fullname" . }}-stable
+            port:
+              number: 8080
+          weight: 100              
 {{ if (hasSuffix "-prod" .Release.Namespace) }}  
       fault:
         abort:

@@ -1,7 +1,8 @@
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include ".helm.fullname" . }}
+  name: {{ include ".helm.fullname" . }}-canary
   labels:
     {{- include ".helm.labels" . | nindent 4 }}
 spec:
@@ -13,3 +14,19 @@ spec:
       name: http
   selector:
     {{- include ".helm.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include ".helm.fullname" . }}-stable
+  labels:
+    {{- include ".helm.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include ".helm.selectorLabels" . | nindent 4 }}    

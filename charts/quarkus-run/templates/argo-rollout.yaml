@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: {{ include ".helm.fullname" . }}
+  labels:
+    {{- include ".helm.labels" . | nindent 4 }}
+spec:
+  replicas: {{ Values.replicaCount }}
+  workloadRef: 
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include ".helm.fullname" . }}
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      {{- include ".helm.selectorLabels" . | nindent 6 }}      
+  strategy:
+    canary:
+      steps:
+      - setWeight: 20
+      - pause: {duration: 10}
+      - setWeight: 40
+      - pause: {duration: 10}
+      - setWeight: 60
+      - pause: {duration: 10}
+      - setWeight: 80
+      - pause: {duration: 10}
+      # Reference to a Service which the controller updates to point to the canary ReplicaSet
+      canaryService: {{ include ".helm.fullname" . }}-canary
+      # Reference to a Service which the controller updates to point to the stable ReplicaSet
+      stableService: {{ include ".helm.fullname" . }}-stable
+      trafficRouting:
+        istio:
+          virtualServices:
+          # One or more virtualServices can be configured
+          # Reference to a VirtualService which the controller updates with canary weights
+          - name: {{ include ".helm.fullname" . }}
