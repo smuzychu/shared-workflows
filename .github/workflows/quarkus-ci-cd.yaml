@@ -147,10 +147,10 @@ jobs:
     - name: update image version
       shell: bash
       run: | 
-        mkdir -p $GITHUB_WORKSPACE/tmp
-        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml > $GITHUB_WORKSPACE/tmp/argo-app.yaml.tmp
-        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' $GITHUB_WORKSPACE/tmp/argo-app.yaml.tmp
-        yq -i '.spec.source.helm.values |= load_str("$GITHUB_WORKSPACE/tmp/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml
+        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml > $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
+        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
+        yq -i '.spec.source.helm.values |= load_str("$GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml
+        rm $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
     - name: Commit files
       run: |
         set -x
@@ -195,10 +195,10 @@ jobs:
     - name: update image version
       shell: bash
       run: | 
-        mkdir -p $GITHUB_WORKSPACE/tmp
-        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml > $GITHUB_WORKSPACE/tmp/argo-app.yaml.tmp
-        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' $GITHUB_WORKSPACE/tmp/argo-app.yaml.tmp
-        yq -i '.spec.source.helm.values |= load_str("$GITHUB_WORKSPACE/tmp/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml
+        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml > $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
+        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
+        yq -i '.spec.source.helm.values |= load_str("$GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml
+        rm $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
 
     - name: Commit files
       run: |
@@ -238,10 +238,10 @@ jobs:
     - name: update image version
       shell: bash
       run: | 
-        mkdir -p $GITHUB_WORKSPACE/tmp
-        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml > $GITHUB_WORKSPACE/tmp/argo-app.yaml.tmp
-        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' $GITHUB_WORKSPACE/tmp/argo-app.yaml.tmp
-        yq -i '.spec.source.helm.values |= load_str("$GITHUB_WORKSPACE/tmp/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml
+        yq '.spec.source.helm.values' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml > $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
+        yq -i  '.quarkus-run.image.tag = "${{ github.sha }}"' $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
+        yq -i '.spec.source.helm.values |= load_str("$GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp")' $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-prod.yaml
+        rm $GITHUB_WORKSPACE/gitops/components/argo-app.yaml.tmp
 
     - name: Commit files
       run: |
