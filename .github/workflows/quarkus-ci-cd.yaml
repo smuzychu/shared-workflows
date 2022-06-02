@@ -147,7 +147,7 @@ jobs:
     - name: update image version
       shell: bash
       run: | 
-        sed -i "s/            tag: [a-zA-Z0-9]*/            tag: ${{ github.sha }}/g" $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-qa.yaml
+        sed -i "s/            tag: [a-zA-Z0-9]*/            tag: ${{ github.sha }}/g" $GITHUB_WORKSPACE/gitops/components/${{ env.REPOSITORY_NAME }}-argocd-app-dev.yaml
     
     - name: Commit files
       run: |
