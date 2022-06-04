@@ -1,0 +1,24 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: "{{ include "dotnet-build.fullname" . }}"
+  labels:
+    {{- include "dotnet-build.labels" . | nindent 4 }}
+spec:
+  output:
+    to:
+      kind: DockerImage
+      name: 'quay.io/{{ .Values.github.owner }}/{{ .Values.github.repo_name }}:{{ .Values.github.commit_sha }}'
+    pushSecret:
+      name: 'quay-push-secret'    
+  strategy:
+    type: Source
+    sourceStrategy:
+      from:
+        kind: DockerImage
+        name: 'ubi8/dotnet-60'
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/{{ .Values.github.owner }}/{{ .Values.github.repo_name }}'
+  runPolicy: Serial
