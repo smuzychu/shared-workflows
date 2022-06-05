@@ -38,23 +38,23 @@ jobs:
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar        
 
-    - name: Cache Maven packages
-      uses: actions/cache@v2
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2        
+    # - name: Cache Maven packages
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: ~/.m2
+    #     key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+    #     restore-keys: ${{ runner.os }}-m2        
 
     - name: Build and analyze
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
         SONAR_HOST_URL: http://sonarqube.sonarqube.svc:9000
-      run: dotnet build $REPOSITORY_NAME
+      run: dotnet build
 
-    - name: Build
-      run: |
-        ./mvnw -B -DskipTests clean package --file pom.xml
+    # - name: Build
+    #   run: |
+    #     ./mvnw -B -DskipTests clean package --file pom.xml
 
 # TODO change this into an s2i build
   image-build:
