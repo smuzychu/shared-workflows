@@ -13,7 +13,9 @@ spec:
   revisionHistoryLimit: 3
   selector:
     matchLabels:
-      {{- include ".helm.selectorLabels" . | nindent 6 }}      
+      {{- include ".helm.selectorLabels" . | nindent 6 }}  
+  progressDeadlineSeconds: 600
+  progressDeadlineAbort: true          
   strategy:
     canary:
       steps:
