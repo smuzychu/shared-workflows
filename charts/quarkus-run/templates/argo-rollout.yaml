@@ -19,7 +19,7 @@ spec:
   strategy:
     canary:
       steps:
-      `{{- toYaml .Values.rollout.steps | nindent 10 }}
+      {{- toYaml .Values.rollout.steps | nindent 8 }}
       # Reference to a Service which the controller updates to point to the canary ReplicaSet
       canaryService: {{ include ".helm.fullname" . }}-canary
       # Reference to a Service which the controller updates to point to the stable ReplicaSet
