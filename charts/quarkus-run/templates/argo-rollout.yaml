@@ -19,14 +19,7 @@ spec:
   strategy:
     canary:
       steps:
-      - setWeight: 20
-      - pause: {duration: 10}
-      - setWeight: 40
-      - pause: {duration: 10}
-      - setWeight: 60
-      - pause: {duration: 10}
-      - setWeight: 80
-      - pause: {duration: 10}
+      `{{- toYaml .Values.rollout.steps | nindent 10 }}
       # Reference to a Service which the controller updates to point to the canary ReplicaSet
       canaryService: {{ include ".helm.fullname" . }}-canary
       # Reference to a Service which the controller updates to point to the stable ReplicaSet

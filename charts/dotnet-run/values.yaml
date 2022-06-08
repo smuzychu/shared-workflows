@@ -110,3 +110,16 @@ alerts:
         long: 3d
         short: 6h
       burn_rate_percent: 1
+
+rollout:
+  steps:
+  #default behavior is the standard rollout. Advanced behavior must be set explicitly.
+    - setWeight: 100
+    # - setWeight: 20
+    # - pause: {duration: 10}
+    # - setWeight: 40
+    # - pause: {duration: 10}
+    # - setWeight: 60
+    # - pause: {duration: 10}
+    # - setWeight: 80
+    # - pause: {duration: 10}      
