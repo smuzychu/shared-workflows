@@ -1,0 +1,13 @@
+apiVersion: dbaas.redhat.com/v1alpha1
+kind: CrdbDBaaSInstance
+metadata:
+  name: "{{ include "cockroach-serverless.fullname" . }}"
+  labels:
+    {{- include "cockroach-serverless.labels" . | nindent 4 }} 
+spec:
+  inventoryRef:
+    name: crdbdbaasinventory-sample
+    namespace: openshift-dbaas-operator
+  cloudProvider: AWS
+  cloudRegion: us-west-2
+  name: "{{ .Values.application }}-{{ .Values.environment }}-{{ include "cockroach-serverless.fullname" . }}"

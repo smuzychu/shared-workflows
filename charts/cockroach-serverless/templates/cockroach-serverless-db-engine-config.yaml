@@ -1,0 +1,20 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: DatabaseSecretEngineConfig
+metadata:
+  name: "{{ include "cockroach-serverless.fullname" . }}"
+  labels:
+    {{- include "cockroach-serverless.labels" . | nindent 4 }}  
+spec:
+  authentication: 
+    path: kubernetes
+    role: database-engine-admin
+  pluginName: postgresql-database-plugin
+  allowedRoles:
+    - read-only
+  connectionURL: postgresql://{{ "{{username}}:{{password}}" }}@free-tier4.aws-us-west-2.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&options=--cluster%3D${{ .Values.application }}-{{ .Values.environment }}-{{ include "cockroach-serverless.fullname" . }}
+  rootCredentials:
+    secret:
+      name: "???"
+    passwordKey: password
+  path: "{{ .Values.application }}-{{ .Values.environment }}/{{ include "cockroach-serverless.fullname" . }}"
+  username: "???"

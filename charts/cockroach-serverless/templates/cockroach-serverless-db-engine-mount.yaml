@@ -1,0 +1,12 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: SecretEngineMount
+metadata:
+  name: "{{ include "cockroach-serverless.fullname" . }}"
+  labels:
+    {{- include "cockroach-serverless.labels" . | nindent 4 }}  
+spec:
+  authentication: 
+    path: kubernetes
+    role: database-engine-admin
+  type: database
+  path: "{{ .Values.application }}-{{ .Values.environment }}"
