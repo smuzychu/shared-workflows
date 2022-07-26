@@ -8,6 +8,6 @@ spec:
   cloudProvider: AWS
   cloudRegion: us-west-2 
   inventoryRef:
-    name: crdbdbaasinventory-sample
+    name: backstage-demo
     namespace: openshift-dbaas-operator
   name: "{{ .Values.application }}-{{ .Values.environment }}-{{ include "cockroach-serverless.fullname" . }}"    
