@@ -7,7 +7,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "2"
 spec:
-  instanceID: {{ "{{" }} (lookup "dbaas.redhat.com" "DBaaSConnection" {{ .Release.Namespace }} {{ .Release.Name }}).status.instanceID {{ "}}" }}
+  instanceID: {{ "{{" }} (lookup "dbaas.redhat.com" "DBaaSConnection" "{{ .Release.Namespace }}" "{{ .Release.Name }}").status.instanceID {{ "}}" }}
   inventoryRef:
     name: backstage-demo
     namespace: openshift-dbaas-operator     
