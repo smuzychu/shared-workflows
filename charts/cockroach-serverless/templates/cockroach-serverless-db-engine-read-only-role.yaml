@@ -9,8 +9,8 @@ spec:
     path: kubernetes
     role: database-engine-admin
   path: "{{ .Values.application }}-{{ .Values.environment }}/{{ include "cockroach-serverless.fullname" . }}"
-  defaultTTL: 1h
-  maxTTL: 24h
+  defaultTTL: 1h0m0s
+  maxTTL: 24h0m0s
   dBName: defaultdb
   creationStatements:
     - CREATE ROLE "{{ "{{name}}" }}" WITH LOGIN PASSWORD '{{ "{{password}}" }}' VALID UNTIL '{{ "{{expiration}}" }}'; GRANT SELECT ON ALL TABLES IN SCHEMA public TO "{{ "{{name}}" }}";
