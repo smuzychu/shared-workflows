@@ -8,7 +8,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
     redhat-cop.redhat.io/patch: |
       spec:
-        instanceID: {{ "{{" }} (lookup "dbaas.redhat.com" "DBaaSInstance" "{{ .Release.Namespace }}" "{{ .Release.Name }}").status.instanceID {{ "}}" }}
+        instanceID: {{ "{{" }} (lookup "dbaas.redhat.com/v1alpha1" "DBaaSInstance" "{{ .Release.Namespace }}" "{{ .Release.Name }}").status.instanceID {{ "}}" }}
 spec:
   instanceID: dummy
   inventoryRef:
