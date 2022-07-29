@@ -1,9 +1,10 @@
 apiVersion: redhatcop.redhat.io/v1alpha1
 kind: DatabaseSecretEngineConfig
 metadata:
-  name: "{{ include "cockroach-serverless.fullname" . }}"
+  name: "{{ .Release.Name }}"
   labels:
-    {{- include "cockroach-serverless.labels" . | nindent 4 }}  
+    inject-username: cockroach-serverless
+    {{- include "cockroach-serverless.labels" . | nindent 4 }}      
 spec:
   authentication: 
     path: kubernetes
@@ -14,7 +15,7 @@ spec:
   connectionURL: postgresql://{{ "{{username}}:{{password}}" }}@free-tier4.aws-us-west-2.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&options=--cluster%3D${{ .Values.application }}-{{ .Values.environment }}-{{ include "cockroach-serverless.fullname" . }}
   rootCredentials:
     secret:
-      name: "???"
+      name: crdb-cloud-user-credentials-{{ .Release.Name }}
     passwordKey: password
-  path: "{{ .Values.application }}-{{ .Values.environment }}/{{ include "cockroach-serverless.fullname" . }}"
-  username: "???"
+  path: "{{ .Values.application }}-{{ .Values.environment }}/{{ .Release.Name }}
+  username: dummy
