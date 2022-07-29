@@ -17,5 +17,5 @@ spec:
     secret:
       name: crdb-cloud-user-credentials-{{ .Release.Name }}
     passwordKey: password
-  path: "{{ .Values.application }}-{{ .Values.environment }}/{{ .Release.Name }}
+  path: "{{ .Values.application }}-{{ .Values.environment }}/{{ .Release.Name }}"
   username: dummy
