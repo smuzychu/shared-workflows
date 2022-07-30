@@ -11,7 +11,8 @@ spec:
     role: database-engine-admin
   pluginName: postgresql-database-plugin
   allowedRoles:
-    - read-only
+    - "{{ .Release.Name }}-read-only"
+    - "{{ .Release.Name }}-read-write"    
   connectionURL: dummy
   rootCredentials:
     secret:
