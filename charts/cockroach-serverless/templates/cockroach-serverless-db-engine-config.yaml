@@ -12,7 +12,7 @@ spec:
   pluginName: postgresql-database-plugin
   allowedRoles:
     - read-only
-  connectionURL: postgresql://{{ "{{username}}:{{password}}" }}@free-tier4.aws-us-west-2.cockroachlabs.cloud:26257/defaultdb?sslmode=verify-full&options=--cluster%3D${{ .Values.application }}-{{ .Values.environment }}-{{ include "cockroach-serverless.fullname" . }}
+  connectionURL: dummy
   rootCredentials:
     secret:
       name: crdb-cloud-user-credentials-{{ .Release.Name }}
