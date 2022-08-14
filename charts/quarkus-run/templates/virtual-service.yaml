@@ -16,7 +16,8 @@ spec:
     - >-
       {{ include ".helm.fullname" . }}-{{ .Release.Namespace }}.mesh.apps.dummy
   http:             
-    - route:
+    - name: primary
+      route:
         - destination:
             host: {{ include ".helm.fullname" . }}-canary
             port:

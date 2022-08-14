@@ -26,7 +26,9 @@ spec:
       stableService: {{ include ".helm.fullname" . }}-stable
       trafficRouting:
         istio:
-          virtualServices:
+          virtualService:
           # One or more virtualServices can be configured
           # Reference to a VirtualService which the controller updates with canary weights
-          - name: {{ include ".helm.fullname" . }}
+            name: {{ include ".helm.fullname" . }}
+            routes: 
+            - primary
