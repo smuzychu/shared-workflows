@@ -19,6 +19,7 @@ spec:
       {{- end }}
       labels:
         {{- include ".helm.selectorLabels" . | nindent 8 }}
+        backstage.io/kubernetes-id: {{ .Values.fullnameOverride }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
