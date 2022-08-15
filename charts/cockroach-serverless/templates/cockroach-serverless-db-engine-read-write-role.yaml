@@ -1,0 +1,16 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: DatabaseSecretEngineRole
+metadata:
+  name: "{{ .Release.Name }}-read-write"
+  labels:
+    {{- include "cockroach-serverless.labels" . | nindent 4 }}  
+spec:
+  authentication: 
+    path: kubernetes
+    role: database-engine-admin
+  path: "{{ .Values.application }}-{{ .Values.environment }}/{{ .Release.Name }}"
+  defaultTTL: 1h0m0s
+  maxTTL: 24h0m0s
+  dBName: "{{ .Release.Name }}"
+  creationStatements:
+    - CREATE ROLE "{{ "{{name}}" }}" WITH LOGIN PASSWORD '{{ "{{password}}" }}' VALID UNTIL '{{ "{{expiration}}" }}'; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO "{{ "{{name}}" }}"; GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public to "{{ "{{name}}" }}";
