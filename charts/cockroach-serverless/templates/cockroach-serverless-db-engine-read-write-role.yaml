@@ -13,4 +13,4 @@ spec:
   maxTTL: 24h0m0s
   dBName: "{{ .Release.Name }}"
   creationStatements:
-    - CREATE ROLE "{{ "{{name}}" }}" WITH LOGIN PASSWORD '{{ "{{password}}" }}' VALID UNTIL '{{ "{{expiration}}" }}'; GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO "{{ "{{name}}" }}"; GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public to "{{ "{{name}}" }}";
+    - CREATE ROLE "{{ "{{name}}" }}" WITH LOGIN PASSWORD '{{ "{{password}}" }}' VALID UNTIL '{{ "{{expiration}}" }}'; GRANT ALL ON ALL TABLES IN SCHEMA public TO "{{ "{{name}}" }}"; GRANT ALL ON ALL SEQUENCES IN SCHEMA public to "{{ "{{name}}" }}";
