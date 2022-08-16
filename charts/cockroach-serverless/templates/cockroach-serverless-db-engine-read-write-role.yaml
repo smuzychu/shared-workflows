@@ -13,4 +13,4 @@ spec:
   maxTTL: 24h0m0s
   dBName: "{{ .Release.Name }}"
   creationStatements:
-    - CREATE ROLE "{{ "{{name}}" }}" WITH LOGIN PASSWORD '{{ "{{password}}" }}' VALID UNTIL '{{ "{{expiration}}" }}'; GRANT ALL PRIVILEGES ON DATABASE defaultdb TO "{{ "{{name}}" }}";
+    - CREATE ROLE "{{ "{{name}}" }}" WITH LOGIN PASSWORD '{{ "{{password}}" }}' VALID UNTIL '{{ "{{expiration}}" }}'; GRANT ALL ON SCHEMA public TO "{{ "{{name}}" }}";
