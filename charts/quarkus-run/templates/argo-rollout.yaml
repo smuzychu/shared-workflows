@@ -1,3 +1,4 @@
+{{- if not (eq .Values.image.tag "dummy") -}}
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
@@ -32,3 +33,4 @@ spec:
             name: {{ include ".helm.fullname" . }}
             routes: 
             - primary
+{{- end }}     
