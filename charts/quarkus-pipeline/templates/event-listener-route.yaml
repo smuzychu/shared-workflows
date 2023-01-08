@@ -1,0 +1,18 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    eventlistener: {{ include ".helm.fullname" . }}
+    {{- include "quarkus-pipeline.labels" . | nindent 4 }}    
+  name: {{ include ".helm.fullname" . }}
+spec:
+  port:
+    targetPort: http-listener
+  to:
+    kind: Service
+    name: {{ include ".helm.fullname" . }}
+    weight: 100
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

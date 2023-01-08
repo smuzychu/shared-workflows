@@ -1,0 +1,21 @@
+apiVersion: redhatcop.redhat.io/v1alpha1
+kind: GitWebhook
+metadata:
+  name: {{ include ".helm.fullname" . }}
+  labels:
+    {{- include "quarkus-pipeline.labels" . | nindent 4 }}  
+spec:
+  gitHub:
+    gitServerCredentials:
+      name: github-credentials
+  repositoryOwner: {{ .Values.repositoryOwner }}
+  ownerType:  {{ .Values.ownerType }}
+  repositoryName: {{ .Values.repositoryName }}
+  webhookURL: {{ .Values.webhookURL }}
+  insecureSSL: true
+  webhookSecret:
+    name: {{ include ".helm.fullname" . }}-webhook-secret
+  events:
+    - push  
+  contentType: json
+  active: true  

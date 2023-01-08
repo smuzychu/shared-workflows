@@ -1,0 +1,21 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: {{ include ".helm.fullname" . }}
+  labels:
+    {{- include "quarkus-pipeline.labels" . | nindent 4 }}  
+spec:
+  serviceAccountName: pipeline
+  triggers:
+  - name: {{ include ".helm.fullname" . }}
+    triggerRef: {{ include ".helm.fullname" . }}
+  resources:
+    kubernetesResource:
+      spec:
+        template:
+          spec:
+            containers:
+            - resources:
+                requests:
+                  cpu: 200m
+                  memory: 500Mi

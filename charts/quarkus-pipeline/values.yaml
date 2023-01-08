@@ -1,0 +1,6 @@
+team: dummy
+repositoryOwner: dummy
+ownerType: organizartion
+repositoryName: dummy
+# https://el-raffa-qrs2-myapp-build.apps.control-cluster-raffa.demo.red-chesterfield.com
+webhookURL: dummy

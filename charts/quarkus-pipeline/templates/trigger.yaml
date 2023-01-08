@@ -1,0 +1,38 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: {{ include ".helm.fullname" . }}
+  labels:
+    {{- include "quarkus-pipeline.labels" . | nindent 4 }}  
+spec:
+  serviceAccountName: pipeline
+  bindings:
+    - ref: {{ include ".helm.fullname" . }}
+  template:
+    ref: {{ include ".helm.fullname" . }}
+  interceptors:
+  - ref:
+      name: "github"
+      kind: ClusterInterceptor
+      apiVersion: triggers.tekton.dev
+    params:
+    - name: "secretRef"
+      value:
+        secretName: {{ include ".helm.fullname" . }}-webhook-secret
+        secretKey: secret
+    - name: "eventTypes"
+      value: ["push"]
+  - name: "only on master branch"
+    ref:
+      name: "cel"
+    params:
+      - name: "filter"
+        value: '"master" in body.ref.split("/")'
+  - name: add-truncated-sha
+    ref:
+      name: "cel"
+    params:
+      - name: "overlays"
+        value:
+        - key: truncated_sha
+          expression: "body.head_commit.id.truncate(7)"        

@@ -1,0 +1,71 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: {{ include ".helm.fullname" . }}
+  labels:
+    {{- include "quarkus-pipeline.labels" . | nindent 4 }}  
+spec:
+  params:
+  - name: revision
+    description: The git revision
+  - name: repo-name
+    description: The name repo
+  - name: repo-owner
+    description: The owner of the repo
+  - name: application-name
+    description: the name of the application  
+
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: quarkus-$(tt.params.repo-name)-
+    spec:
+      serviceAccountName: pipeline
+      pipelineRef:
+        name: {{ include ".helm.fullname" . }}
+      params:
+      - name: repo-name
+        value: $(tt.params.repo-name)
+      - name: repo-owner
+        value: $(tt.params.repo-owner)  
+      - name: repo-url
+        value: https://github.com/$(tt.params.repo-owner)/$(tt.params.repo-name).git
+      - name: revision
+        value: $(tt.params.revision)
+      - name: image
+        value: quay.io/$(tt.params.repo-owner)/$(tt.params.repo-name):$(tt.params.revision)
+      - name: gitops-repo-url
+        value: https://github.com/$(tt.params.repo-owner)/$(tt.params.application-name)-gitops.git
+      - name: application-name
+        value: $(tt.params.application-name)
+      - name: sonarcloud-organization
+        value: $(tt.params.repo-owner)
+      - name: tasks-to-skip
+        value:
+        - placeholder
+        - code-analysis  
+      workspaces:
+        - name: source-workspace
+          subPath: source
+          persistentVolumeClaim:
+            claimName: {{ include ".helm.fullname" . }}-code-workspace
+        - emptyDir: {}
+          name: sonar-settings
+        - name: sonar-credentials
+          secret:
+            secretName: sonarqube-credentials
+        - name: maven-settings
+          subPath: maven-repo-cache
+          persistentVolumeClaim:
+            claimName: {{ include ".helm.fullname" . }}-code-workspace
+        - name: dockerconfig
+          secret:
+            secretName: quay-push-secret
+        - name: basic-auth
+          secret:
+            secretName: github-credentials
+        - name: gitops-source-workspace
+          subPath: gitops-source
+          persistentVolumeClaim:
+            claimName: {{ include ".helm.fullname" . }}-code-workspace                      

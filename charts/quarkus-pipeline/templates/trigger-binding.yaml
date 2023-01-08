@@ -1,0 +1,18 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: {{ include ".helm.fullname" . }}
+  labels:
+    {{- include "quarkus-pipeline.labels" . | nindent 4 }}  
+spec:
+  params:
+  - name: repo-owner
+    value: $(body.repository.organization)
+  - name: repo-name
+    value: $(body.repository.name)
+  - name: revision
+    value: $(body.head_commit.id)
+  - name: truncated_sha
+    value: $(extensions.truncated_sha)
+  - name: application-name
+    value: myapp 
