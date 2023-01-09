@@ -2,16 +2,16 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   labels:
-    eventlistener: {{ include ".quarkus-pipeline.fullname" . }}
+    eventlistener: {{ include "quarkus-pipeline.fullname" . }}
     {{- include "quarkus-pipeline.labels" . | nindent 4 }}    
-  name: {{ include ".quarkus-pipeline.fullname" . }}
+  name: {{ include "quarkus-pipeline.fullname" . }}
 spec:
-  host: {{ include ".quarkus-pipeline.fullname" . }}-{{ .Release.Namespace}}/{{ .Values.baseURL }}
+  host: {{ include "quarkus-pipeline.fullname" . }}-{{ .Release.Namespace}}/{{ .Values.baseURL }}
   port:
     targetPort: http-listener
   to:
     kind: Service
-    name: {{ include ".quarkus-pipeline.fullname" . }}
+    name: {{ include "quarkus-pipeline.fullname" . }}
     weight: 100
   tls:
     termination: edge

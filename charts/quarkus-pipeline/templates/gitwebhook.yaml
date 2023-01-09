@@ -1,7 +1,7 @@
 apiVersion: redhatcop.redhat.io/v1alpha1
 kind: GitWebhook
 metadata:
-  name: {{ include ".quarkus-pipeline.fullname" . }}
+  name: {{ include "quarkus-pipeline.fullname" . }}
   labels:
     {{- include "quarkus-pipeline.labels" . | nindent 4 }}  
 spec:
@@ -11,10 +11,10 @@ spec:
   repositoryOwner: {{ .Values.repositoryOwner }}
   ownerType:  {{ .Values.ownerType }}
   repositoryName: {{ .Values.repositoryName }}
-  webhookURL: https://{{ include ".quarkus-pipeline.fullname" . }}-{{ .Release.Namespace}}/{{ .Values.baseURL }}
+  webhookURL: https://{{ include "quarkus-pipeline.fullname" . }}-{{ .Release.Namespace}}/{{ .Values.baseURL }}
   insecureSSL: true
   webhookSecret:
-    name: {{ include ".quarkus-pipeline.fullname" . }}-webhook-secret
+    name: {{ include "quarkus-pipeline.fullname" . }}-webhook-secret
   events:
     - push  
   contentType: json

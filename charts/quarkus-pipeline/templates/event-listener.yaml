@@ -1,14 +1,14 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: {{ include ".quarkus-pipeline.fullname" . }}
+  name: {{ include "quarkus-pipeline.fullname" . }}
   labels:
     {{- include "quarkus-pipeline.labels" . | nindent 4 }}  
 spec:
   serviceAccountName: pipeline
   triggers:
-  - name: {{ include ".quarkus-pipeline.fullname" . }}
-    triggerRef: {{ include ".quarkus-pipeline.fullname" . }}
+  - name: {{ include "quarkus-pipeline.fullname" . }}
+    triggerRef: {{ include "quarkus-pipeline.fullname" . }}
   resources:
     kubernetesResource:
       spec:

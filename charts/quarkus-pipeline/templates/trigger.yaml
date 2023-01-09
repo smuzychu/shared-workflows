@@ -1,15 +1,15 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: {{ include ".quarkus-pipeline.fullname" . }}
+  name: {{ include "quarkus-pipeline.fullname" . }}
   labels:
     {{- include "quarkus-pipeline.labels" . | nindent 4 }}  
 spec:
   serviceAccountName: pipeline
   bindings:
-    - ref: {{ include ".quarkus-pipeline.fullname" . }}
+    - ref: {{ include "quarkus-pipeline.fullname" . }}
   template:
-    ref: {{ include ".quarkus-pipeline.fullname" . }}
+    ref: {{ include "quarkus-pipeline.fullname" . }}
   interceptors:
   - ref:
       name: "github"
@@ -18,7 +18,7 @@ spec:
     params:
     - name: "secretRef"
       value:
-        secretName: {{ include ".quarkus-pipeline.fullname" . }}-webhook-secret
+        secretName: {{ include "quarkus-pipeline.fullname" . }}-webhook-secret
         secretKey: secret
     - name: "eventTypes"
       value: ["push"]

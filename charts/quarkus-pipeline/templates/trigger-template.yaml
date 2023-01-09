@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: {{ include ".quarkus-pipeline.fullname" . }}
+  name: {{ include "quarkus-pipeline.fullname" . }}
   labels:
     {{- include "quarkus-pipeline.labels" . | nindent 4 }}  
 spec:
@@ -23,7 +23,7 @@ spec:
     spec:
       serviceAccountName: pipeline
       pipelineRef:
-        name: {{ include ".quarkus-pipeline.fullname" . }}
+        name: {{ include "quarkus-pipeline.fullname" . }}
       params:
       - name: repo-name
         value: $(tt.params.repo-name)
@@ -49,7 +49,7 @@ spec:
         - name: source-workspace
           subPath: source
           persistentVolumeClaim:
-            claimName: {{ include ".quarkus-pipeline.fullname" . }}-code-workspace
+            claimName: {{ include "quarkus-pipeline.fullname" . }}-code-workspace
         - emptyDir: {}
           name: sonar-settings
         - name: sonar-credentials
@@ -58,7 +58,7 @@ spec:
         - name: maven-settings
           subPath: maven-repo-cache
           persistentVolumeClaim:
-            claimName: {{ include ".quarkus-pipeline.fullname" . }}-code-workspace
+            claimName: {{ include "quarkus-pipeline.fullname" . }}-code-workspace
         - name: dockerconfig
           secret:
             secretName: quay-push-secret
@@ -68,4 +68,4 @@ spec:
         - name: gitops-source-workspace
           subPath: gitops-source
           persistentVolumeClaim:
-            claimName: {{ include ".quarkus-pipeline.fullname" . }}-code-workspace                      
+            claimName: {{ include "quarkus-pipeline.fullname" . }}-code-workspace                      
