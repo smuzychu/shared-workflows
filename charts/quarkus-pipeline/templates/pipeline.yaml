@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: {{ include ".helm.fullname" . }}
+  name: {{ include ".quarkus-pipeline.fullname" . }}
   labels:
     {{- include "quarkus-pipeline.labels" . | nindent 4 }}  
 spec:
