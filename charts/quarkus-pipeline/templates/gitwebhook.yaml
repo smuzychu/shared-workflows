@@ -11,7 +11,7 @@ spec:
   repositoryOwner: {{ .Values.repositoryOwner }}
   ownerType:  {{ .Values.ownerType }}
   repositoryName: {{ .Values.repositoryName }}
-  webhookURL: {{ .Values.webhookURL }}
+  webhookURL: https://{{ include ".helm.fullname" . }}-{{ .Release.Namespace}}/{{ .Values.baseURL }}
   insecureSSL: true
   webhookSecret:
     name: {{ include ".helm.fullname" . }}-webhook-secret

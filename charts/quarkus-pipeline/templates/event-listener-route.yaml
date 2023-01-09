@@ -6,6 +6,7 @@ metadata:
     {{- include "quarkus-pipeline.labels" . | nindent 4 }}    
   name: {{ include ".helm.fullname" . }}
 spec:
+  host: {{ include ".helm.fullname" . }}-{{ .Release.Namespace}}/{{ .Values.baseURL }}
   port:
     targetPort: http-listener
   to:
