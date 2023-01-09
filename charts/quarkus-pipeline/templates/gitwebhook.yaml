@@ -14,7 +14,7 @@ spec:
   webhookURL: https://{{ include "quarkus-pipeline.fullname" . }}-{{ .Release.Namespace}}.{{ .Values.baseURL }}
   insecureSSL: true
   webhookSecret:
-    name: {{ include "quarkus-pipeline.fullname" . }}-webhook-secret
+    name: {{ include "quarkus-pipeline.fullname" . }}-webhook
   events:
     - push  
   content: json
