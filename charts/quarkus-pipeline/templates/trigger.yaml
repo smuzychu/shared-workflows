@@ -18,7 +18,7 @@ spec:
     params:
     - name: "secretRef"
       value:
-        secretName: {{ include "quarkus-pipeline.fullname" . }}-webhook-secret
+        secretName: {{ include "quarkus-pipeline.fullname" . }}-webhook
         secretKey: secret
     - name: "eventTypes"
       value: ["push"]
