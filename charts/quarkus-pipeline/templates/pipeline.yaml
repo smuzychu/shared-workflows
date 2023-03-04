@@ -196,7 +196,7 @@ spec:
     - name: GIT_SCRIPT
       value: |
         sed -i "s/            tag: [a-zA-Z0-9]*/            tag: $(params.revision)/g" components/$(params.repo-name)-argocd-app-dev.yaml
-        git commit -m "image update - release dev $(params.revision)" -a
+        git commit -m "image update - release dev $(params.revision)" -a --allow-empty
         git push $(params.gitops-repo-url) HEAD:master --follow-tags
   - name: verify-deployment-to-dev
     runAfter:
@@ -234,7 +234,7 @@ spec:
     - name: GIT_SCRIPT
       value: |
         sed -i "s/            tag: [a-zA-Z0-9]*/            tag: $(params.revision)/g" components/$(params.repo-name)-argocd-app-qa.yaml
-        git commit -m "image update - release qa $(params.revision)" -a
+        git commit -m "image update - release qa $(params.revision)" -a --allow-empty
         git push $(params.gitops-repo-url) HEAD:master --follow-tags
   - name: verify-deployment-to-qa
     runAfter:
@@ -272,7 +272,7 @@ spec:
     - name: GIT_SCRIPT
       value: |
         sed -i "s/            tag: [a-zA-Z0-9]*/            tag: $(params.revision)/g" components/$(params.repo-name)-argocd-app-prod.yaml
-        git commit -m "image update - release prod $(params.revision)" -a
+        git commit -m "image update - release prod $(params.revision)" -a --allow-empty
         git push $(params.gitops-repo-url) HEAD:master --follow-tags
   - name: verify-deployment-to-prod
     runAfter:
