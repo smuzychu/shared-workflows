@@ -11,7 +11,7 @@ spec:
   repositoryOwner: {{ .Values.repositoryOwner }}
   ownerType:  {{ .Values.ownerType }}
   repositoryName: {{ .Values.repositoryName }}
-  webhookURL: https://{{ include "quarkus-pipeline.fullname" . }}-{{ .Release.Namespace}}.{{ .Values.baseURL }}
+  webhookURL: https://{{ include "quarkus-pipeline.fullname" . }}-{{ .Release.Namespace}}.apps.{{ .Values.baseURL }}
   insecureSSL: true
   webhookSecret:
     name: {{ include "quarkus-pipeline.fullname" . }}-webhook
