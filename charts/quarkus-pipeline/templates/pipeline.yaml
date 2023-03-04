@@ -84,6 +84,7 @@ spec:
   - name: code-analysis
     taskRef:
       name: sonarqube-scanner
+      kind: ClusterTask
     runAfter:
       - build-code      
     when:
