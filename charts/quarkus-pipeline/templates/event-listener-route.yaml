@@ -11,7 +11,7 @@ spec:
     targetPort: http-listener
   to:
     kind: Service
-    name: {{ include "quarkus-pipeline.fullname" . }}
+    name: el-{{ include "quarkus-pipeline.fullname" . }}
     weight: 100
   tls:
     termination: edge
