@@ -5,3 +5,4 @@ repositoryName: dummy
 # apps.control-cluster-raffa.demo.red-chesterfield.com
 baseURL: dummy
 workspaceSize: 1Gi
+application: dummy

@@ -15,4 +15,4 @@ spec:
   - name: truncated_sha
     value: $(extensions.truncated_sha)
   - name: application-name
-    value: myapp 
+    value: {{ .Values.application }} 
