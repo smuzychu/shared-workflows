@@ -18,7 +18,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - 'ddosify -t http://istio-ingressgateway.istio-system.svc:80 -d 300 -n 600 -h "host: {{ include ".helm.fullname" . }}.{{ .Release.Namespace }}.svc"'
+            - ddosify -t https://{{ include ".helm.fullname" . }}-{{ .Release.Namespace }}.mesh.apps.{{ .Values.baseDomain }} -d 300 -n 600
             resources:
               requests:
                 memory: "128Mi"
