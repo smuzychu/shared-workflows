@@ -13,8 +13,8 @@ spec:
   gateways:
     - istio-system/mesh-gateway
   hosts:
-    - >-
-      {{ include ".helm.fullname" . }}-{{ .Release.Namespace }}.mesh.apps.dummy
+    - {{ include ".helm.fullname" . }}-{{ .Release.Namespace }}.mesh.apps.{{ .Values.baseDomain }}
+    - {{ include ".helm.fullname" . }}.{{ .Release.Namespace }}.svc
   http:             
     - name: primary
       route:

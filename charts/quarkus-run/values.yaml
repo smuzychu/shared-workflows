@@ -82,6 +82,8 @@ tolerations: []
 
 affinity: {}
 
+baseDomain: dummy
+
 slo_percent: 99.99
 latency: 1000
 
