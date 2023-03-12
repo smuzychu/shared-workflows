@@ -43,18 +43,12 @@ spec:
         value: $(tt.params.repo-owner)
       - name: tasks-to-skip
         value:
-        - placeholder
-        - code-analysis  
+        - placeholder  
       workspaces:
         - name: source-workspace
           subPath: source
           persistentVolumeClaim:
             claimName: {{ include "quarkus-pipeline.fullname" . }}-code-workspace
-        - emptyDir: {}
-          name: sonar-settings
-        - name: sonar-credentials
-          secret:
-            secretName: sonarqube-credentials
         - name: maven-settings
           subPath: maven-repo-cache
           persistentVolumeClaim:

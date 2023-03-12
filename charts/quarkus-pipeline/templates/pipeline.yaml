@@ -35,8 +35,6 @@ spec:
     type: array               
   workspaces:
   - name: source-workspace
-  - name: sonar-settings
-  - name: sonar-credentials
   - name: maven-settings
   - name: dockerconfig
   - name: basic-auth
@@ -97,16 +95,12 @@ spec:
       - name: SONAR_PROJECT_KEY
         value: "$(params.repo-name)" 
       - name: SONAR_ORGANIZATION
-        value: "$(params.sonarcloud-organization)"
-      - name: SONAR_LOGIN_KEY
-        value: "SONARQUBE_TOKEN"  
+        value: "$(params.sonarcloud-organization)"  
     workspaces:
       - name: source
         workspace: source-workspace
-      - name: sonar-settings
-        workspace: sonar-settings
-      - name: sonar-credentials
-        workspace: sonar-credentials               
+      - name: maven-settings
+        workspace: maven-settings             
   - name: build-code
     taskRef:
       kind: ClusterTask
@@ -131,7 +125,6 @@ spec:
       workspace: maven-settings                 
   - name: build-image
     runAfter: 
-    - build-code
     - code-analysis
     when:
       - input: build-image
@@ -171,10 +164,45 @@ spec:
     - name: revision
       value: master
     - name: deleteExisting
-      value: "true"       
+      value: "true"
+  - name: create-sbom
+    runAfter: 
+    - build-image
+    when:
+      - input: create-sbom
+        operator: notin
+        values: ["$(params.tasks-to-skip[*])"]
+    taskRef:
+      kind: ClusterTask
+      name: syft
+    params:
+    - name: IMAGE
+      value: quay.io/$(params.repo-owner)/$(params.repo-name)@$(tasks.build-image.results.IMAGE_DIGEST)
+    - name: TUF_URL
+      value: https://tuf.apps.{{ .Values.baseURL }}
+    - name: REKOR_URL
+      value: https://rekor.apps.{{ .Values.baseURL }}      
+  - name: create-serif-report
+    runAfter: 
+    - build-image
+    when:
+      - input: create-serif-report
+        operator: notin
+        values: ["$(params.tasks-to-skip[*])"]
+    taskRef:
+      kind: ClusterTask
+      name: grype
+    params:
+    - name: IMAGE
+      value: quay.io/$(params.repo-owner)/$(params.repo-name)@$(tasks.build-image.results.IMAGE_DIGEST)
+    - name: TUF_URL
+      value: https://tuf.apps.{{ .Values.baseURL }}
+    - name: REKOR_URL
+      value: https://rekor.apps.{{ .Values.baseURL }}                              
   - name: deploy-to-dev
     runAfter:
-      - build-image
+      - create-serif-report
+      - create-sbom
       - fetch-gitops-source
     when:
       - input: deploy-to-dev
