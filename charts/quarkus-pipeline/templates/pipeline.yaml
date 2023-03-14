@@ -39,6 +39,13 @@ spec:
   - name: dockerconfig
   - name: basic-auth
   - name: gitops-source-workspace
+  results:
+    - name: IMAGE_URL
+      description: the image url
+      value: $(tasks.build-image.results.IMAGE_URL)
+    - name: IMAGE_DIGEST
+      description: the image digest
+      value: $(tasks.build-image.results.IMAGE_DIGEST)  
   tasks:
   - name: acquire-lease
     taskRef:
