@@ -52,7 +52,7 @@ jobs:
       if: steps.is-component.outputs.files_exists == 'true'
       with:
         fetch-depth: 0
-        repository: https://github.com/raf-backstage-demo/allowed-namespaces
+        repository: https://github.com/smuzychu/allowed-namespaces
         path: allowed-namespaces
 
     - name: checkout code
@@ -60,7 +60,7 @@ jobs:
       if: steps.is-component.outputs.files_exists == 'true'
       with:
         fetch-depth: 0
-        repository: https://github.com/raf-backstage-demo/shared-workflows
+        repository: https://github.com/smuzychu/shared-workflows
         path: shared-workflows        
 
     - name: create namespace

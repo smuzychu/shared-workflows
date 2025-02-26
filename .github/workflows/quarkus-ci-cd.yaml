@@ -100,7 +100,7 @@ jobs:
       shell: bash
       run: | 
         helm --debug --kube-apiserver https://kubernetes.default.svc:443 --kube-ca-file /var/run/secrets/kubernetes.io/serviceaccount/ca.crt --kube-token $(cat /var/run/secrets/kubernetes.io/serviceaccount/token) \
-        upgrade --repo https://raf-backstage-demo.github.io/shared-workflows --version "0.1.0" ${{ env.REPOSITORY_NAME }} quarkus-build -i -n ${{ inputs.app }}-build \
+        upgrade --repo https://smuzychu.github.io/shared-workflows --version "0.1.0" ${{ env.REPOSITORY_NAME }} quarkus-build -i -n ${{ inputs.app }}-build \
         --set github.owner=${{ github.repository_owner }} --set github.repo_name=${{ env.REPOSITORY_NAME }} --set github.commit_sha=${{ github.sha }} --set github.pat=${{ github.token }} \
         --set nameOverride=${{ env.REPOSITORY_NAME }}
 
@@ -140,7 +140,7 @@ jobs:
     - name: checkout application gitops repo
       uses: actions/checkout@v3
       with:
-        repository: raf-backstage-demo/${{ inputs.app }}-gitops
+        repository: smuzychu/${{ inputs.app }}-gitops
         persist-credentials: false
         path: gitops
   
@@ -155,7 +155,7 @@ jobs:
         git -C $GITHUB_WORKSPACE/gitops config --local user.email "quarkus-ci+github-actions[bot]@users.noreply.github.com"
         git -C $GITHUB_WORKSPACE/gitops config --local user.name "github-actions[bot]"
         git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release dev ${{ github.sha }}" -a
-        git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
+        git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/smuzychu/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
 
     - name: integration tests (emulated)
       run: |
@@ -179,7 +179,7 @@ jobs:
     - name: checkout application gitops repo
       uses: actions/checkout@v3
       with:
-        repository: raf-backstage-demo/${{ inputs.app }}-gitops
+        repository: smuzychu/${{ inputs.app }}-gitops
         persist-credentials: false
         path: gitops
   
@@ -194,7 +194,7 @@ jobs:
         git -C $GITHUB_WORKSPACE/gitops config --local user.email "quarkus-ci+github-actions[bot]@users.noreply.github.com"
         git -C $GITHUB_WORKSPACE/gitops config --local user.name "github-actions[bot]"
         git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release qa ${{ github.sha }}" -a
-        git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
+        git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/smuzychu/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
 
     - name: integration tests (emulated)
       run: |
@@ -219,7 +219,7 @@ jobs:
     - name: checkout application gitops repo
       uses: actions/checkout@v3
       with:
-        repository: raf-backstage-demo/${{ inputs.app }}-gitops
+        repository: smuzychu/${{ inputs.app }}-gitops
         persist-credentials: false
         path: gitops
   
@@ -234,7 +234,7 @@ jobs:
         git -C $GITHUB_WORKSPACE/gitops config --local user.email "quarkus-ci+github-actions[bot]@users.noreply.github.com"
         git -C $GITHUB_WORKSPACE/gitops config --local user.name "github-actions[bot]"
         git -C $GITHUB_WORKSPACE/gitops commit -m "image update - release - prod ${{ github.sha }}" -a
-        git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/raf-backstage-demo/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
+        git -C $GITHUB_WORKSPACE/gitops push https://github-actions[bot]:$(cat /github/home/_github/token)@github.com/smuzychu/${{ inputs.app }}-gitops.git HEAD:master --follow-tags
 
     - name: integration tests (emulated)
       run: |
